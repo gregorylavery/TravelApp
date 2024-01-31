@@ -1,10 +1,16 @@
-IF EXISTS (SELECT 1 FROM sys.databases WHERE name = 'TRANSPORTATION')
-BEGIN
-    -- Drop the existing TRANSPORTATION database
-    USE master; -- Switch to master database before dropping
-    ALTER DATABASE TRANSPORTATION SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    DROP DATABASE TRANSPORTATION;
-END
+
+
+-- TODO: Keep this code to allow the database to be rebuilt, Can use the fact that we have a persistent volume and if we need to reset anything we just delete that.
+-- Code below should be updated to check for existence of the Db and tables so it can be re-run without any warning/error showing.
+
+
+-- IF EXISTS (SELECT 1 FROM sys.databases WHERE name = 'TRANSPORTATION')
+-- BEGIN
+    -- -- Drop the existing TRANSPORTATION database
+    -- USE master; -- Switch to master database before dropping
+    -- ALTER DATABASE TRANSPORTATION SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    -- DROP DATABASE TRANSPORTATION;
+-- END
 
 PRINT 'Populating the Database'
 GO
@@ -72,34 +78,39 @@ SET IDENTITY_INSERT TRANSPORTATION_OPTIONS OFF;
 
 -- Use the TRANSPORTATION database
 --USE TRANSPORTATION;
-
 -- Create TRANSPORTATION_OPTIONS table
 CREATE TABLE BOOKING(
 	BOOKING_ID INT IDENTITY(1,1) NOT NULL,
 	ID INT NULL,
 	PAYMENT_ID INT NULL,
+	USER_LOGIN_ID INT NULL,
 );
+-- Enable IDENTITY_INSERT for TRANSPORTATION_OPTIONS
+SET IDENTITY_INSERT BOOKING ON;
+
 GO
 
 -- Use the TRANSPORTATION database
 USE TRANSPORTATION;
-
 CREATE TABLE PAYMENT(
 	PAYMENT_ID INT IDENTITY(1,1) NOT NULL,
 	ID INT,
 	PRICE DECIMAL(10, 2),
 	PAYMENT_TYPE_ID INT NULL,
 );
+-- Enable IDENTITY_INSERT for TRANSPORTATION_OPTIONS
+SET IDENTITY_INSERT PAYMENT ON;
 GO
 
 -- Use the TRANSPORTATION database
 --USE TRANSPORTATION;
-
 CREATE TABLE USER_LOGINS(
 	USER_LOGIN_ID INT IDENTITY(1,1) NOT NULL,
 	USER_EMAIL NVARCHAR(255) NULL,
 	USER_PASSWORD NVARCHAR(255) NULL,
 );
+-- Enable IDENTITY_INSERT for TRANSPORTATION_OPTIONS
+SET IDENTITY_INSERT USER_LOGINS ON;
 GO
 
 -- Use the TRANSPORTATION database
@@ -123,6 +134,6 @@ VALUES
     (4, 'VISA', 'Visa');
 GO
 
-grant execute ON OBJECT::TRANSPORTATION_OPTIONS to dbo  ;
-GO
+-- grant execute ON OBJECT::TRANSPORTATION_OPTIONS to dbo  ;
+-- GO
 
