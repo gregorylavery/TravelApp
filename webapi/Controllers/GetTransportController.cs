@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web.Resource;
 using System.Linq;
 using System.Reflection.Metadata;
@@ -37,7 +38,20 @@ namespace webapi.Controllers
             List<TransportationOption> options = _db.TransportationOptions.Where(c=>c.Id >0).ToList();
             return Ok(options);
         }
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TransportationOption))]
+        [HttpGet("GetTransportationOption")]
+        public async Task<IActionResult> GetTransportationOptions(int id)
+        {
+            if (id <= 0)
+                return BadRequest("Invalid Transport Option id");
 
+            TransportationOption option = _db.TransportationOptions.Where(c => c.Id == id).SingleOrDefault();
+
+            if (option == null)
+                return NotFound("Invalid Transport Option id");
+
+            return Ok(option);
+        }
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<Booking>))]
         [HttpGet("GetBookings")]
         public async Task<IActionResult> GetBookings()
@@ -47,15 +61,22 @@ namespace webapi.Controllers
         }
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(bool))]
         [HttpPost("SaveBookings")]
-        public async Task<IActionResult> SaveBooking(int transportation_option_id, int user_login_id )
+        public async Task<IActionResult> SaveBooking(int transportation_option_id, int payment_id, int user_login_id )
         {
             if (transportation_option_id <= 0 )
                 return BadRequest("Invalid transportation type");
             if (user_login_id <= 0)
                 return BadRequest("Invalid user id");
-//            _db.Bookings.Add(new Booking())
-            List<Booking> options = _db.Bookings.Where(c => c.Id > 0).ToList();
-            return Ok(options);
+
+            var payment = new Payment { Id = transportation_option_id, PaymentTypeId = "AMEX" };
+            _db.Payments.Add(payment);
+            //var booking = new Booking { Id = transportation_option_id, PaymentId = payment_id };
+            //_db.Bookings.Add(booking);
+            _db.Database.ExecuteSqlRaw("SET IDENTITY_INSERT PAYMENT ON");
+            _db.SaveChanges();
+            _db.Database.ExecuteSqlRaw("SET IDENTITY_INSERT PAYMENT OFF");
+
+            return Ok(payment.PaymentId);
         }
 
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<Payment>))]

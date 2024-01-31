@@ -42,6 +42,9 @@ public partial class TransportationContext : DbContext
                 .HasColumnName("BOOKING_ID");
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.PaymentId).HasColumnName("PAYMENT_ID");
+            //entity.Property(e => e.UserLoginId)
+            //    .ValueGeneratedOnAdd()
+            //    .HasColumnName("USER_LOGIN_ID");
         });
 
         modelBuilder.Entity<Payment>(entity =>

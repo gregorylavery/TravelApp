@@ -15,4 +15,8 @@ public partial class Booking
 
     [Column("PAYMENT_ID")]
     public int? PaymentId { get; set; }
+
+    //TODO: Fix the model to add this which is now present in the table
+    //[Column("USER_LOGIN_ID")]
+    //public int? UserLoginId { get; set; }
 }
