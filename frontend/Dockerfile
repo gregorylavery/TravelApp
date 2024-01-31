@@ -1,14 +1,14 @@
-FROM node:19-bullseye AS build
-
-WORKDIR /app
-COPY . .
-RUN npm ci --omit=dev && \
-    npm run build
-
-FROM caddy:2.6.4-alpine AS deploy
-COPY --from=build /app/Caddyfile /etc/caddy/Caddyfile
-COPY --from=build /app/build /app/dist
-
+FROM node:lts AS development
+ 
+WORKDIR /code
+COPY package.json /code/package.json
+COPY package-lock.json /code/package-lock.json
+RUN npm ci
+COPY . /code
+RUN npm run build
+ 
+CMD [ "npm", "start" ]
+ 
 EXPOSE 3000 3001
-USER 1001
+ 
 HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost/:3001/health || exit 1
